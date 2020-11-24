@@ -65,8 +65,8 @@ export class PresenceChannel {
                 .in(channel)
                 .clients((error, clients) => {
                     members = members || [];
-                    members = members.filter(member => {
-                        return ((clients.indexOf(member.socketId) >= 0) || (member.user_info && member.user_info.hide_online));
+                    members = members.filter((member) => {
+                        return clients.indexOf(member.socketId) >= 0;
                     });
 
                     this.db.set(channel + ":members", members);
@@ -174,7 +174,7 @@ export class PresenceChannel {
     onSubscribed(socket: any, channel: string, members: any[]) {
         this.getFakeMembers(channel).then(fakeMembers => {
             fakeMembers = fakeMembers || [];
-
+            members = members.filter((m) => !(m.user_info && m.user_info.hide_online));
             members = _.merge(members, fakeMembers);
 
             this.io.to(socket.id).emit("presence:subscribed", channel, members);
